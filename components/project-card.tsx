@@ -1,0 +1,33 @@
+import Link from "next/link";
+import type { Project } from "@/lib/content";
+import { PointerIcon } from "./icons";
+import { Media } from "./media";
+
+type ProjectCardProps = {
+  project: Project;
+  headingLevel?: "h2" | "h3";
+};
+
+export function ProjectCard({ project, headingLevel: Heading = "h3" }: ProjectCardProps) {
+  return (
+    <article className="group relative">
+      <Link
+        href={`/projects/${project.slug}`}
+        className="flex flex-col gap-5 rounded-[28px] bg-surface p-4 transition-colors duration-300 hover:bg-surface-hover sm:gap-6 sm:rounded-[36px] sm:p-6"
+      >
+        <Media
+          image={project.cover}
+          sizes="(min-width: 640px) 592px, calc(100vw - 64px)"
+          className="aspect-[592/300] w-full rounded-2xl sm:rounded-3xl"
+          imageClassName="transition-transform duration-700 ease-out-soft group-hover:scale-[1.03]"
+        />
+        <div className="flex flex-col gap-2">
+          <Heading className="text-xl font-medium sm:text-2xl">{project.title}</Heading>
+          <p className="text-pretty text-muted">{project.summary}</p>
+        </div>
+      </Link>
+
+      <PointerIcon className="pointer-events-none absolute -left-[67px] top-[162px] hidden -translate-x-3 text-accent opacity-0 transition duration-300 ease-out-soft group-hover:translate-x-0 group-hover:opacity-100 group-focus-within:translate-x-0 group-focus-within:opacity-100 xl:block" />
+    </article>
+  );
+}

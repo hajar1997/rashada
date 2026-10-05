@@ -1,0 +1,286 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #1a1a1a;
+  --color-paper: #fafafa;
+  --color-muted: #9c9c9c;
+  --color-surface: #2b2b2b;
+  --color-surface-hover: #323232;
+  --color-placeholder: #d9d9d9;
+  --color-accent: #0600e8;
+  --color-lilac: #faefff;
+  --color-dash: #dbdbdb;
+  --color-hint: #7a7a7a;
+
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-fade-in: fade-in 450ms var(--ease-out-soft);
+  --animate-pop-in: pop-in 400ms var(--ease-out-soft);
+
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: scale(0.92);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Render the whole site at 80% scale on larger screens, matching browser zoom at 80%. */
+  @media (min-width: 768px) {
+    html {
+      zoom: 0.8;
+    }
+  }
+
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+    font-family: var(--font-sans);
+    line-height: normal;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-paper);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+}
+
+/* Scroll-linked fill for the side ruler. Browsers without scroll timelines keep the static ruler. */
+@supports (animation-timeline: scroll()) {
+  .scroll-fill {
+    animation: scroll-fill linear both;
+    animation-timeline: scroll(root block);
+  }
+
+  /* The horizon line and contact tab ride down with the ruler's fill edge. */
+  .scroll-follow {
+    animation: scroll-follow linear both;
+    animation-timeline: scroll(root block);
+  }
+
+  @keyframes scroll-follow {
+    to {
+      /* Ruler height: 27 one-pixel ticks with 8px gaps. */
+      transform: translateY(235px);
+    }
+  }
+
+  @keyframes scroll-fill {
+    from {
+      clip-path: inset(0 0 100% 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+}
+
+/* Futuristic 3D chrome monogram on the about-page card stack. */
+.letter-3d {
+  transform: rotateY(-24deg) rotateX(10deg);
+  animation: letter-sway 7s ease-in-out infinite alternate;
+}
+
+@keyframes letter-sway {
+  to {
+    transform: rotateY(-8deg) rotateX(4deg) translateY(-8px);
+  }
+}
+
+/* Extruded depth: stepped shadows darken toward the back, then a soft cast shadow. */
+.chrome-extrude {
+  color: #9aa0a7;
+  text-shadow:
+    1px 1px 0 #8b9097,
+    2px 2px 0 #7b8087,
+    3px 3px 0 #6b7076,
+    4px 4px 0 #5b6066,
+    5px 5px 0 #4c5056,
+    6px 6px 0 #3e4247,
+    7px 7px 0 #33363a,
+    8px 8px 0 #2a2c30,
+    9px 9px 0 #232528,
+    16px 24px 28px rgb(0 0 0 / 0.7);
+}
+
+.chrome-text {
+  background: linear-gradient(
+    172deg,
+    #ffffff 0%,
+    #c7cbd1 20%,
+    #5a5f66 44%,
+    #f5f7fa 49%,
+    #8b9097 60%,
+    #e8ebef 80%,
+    #6e737a 100%
+  );
+  background-size: 100% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(255 255 255 / 0.45);
+  animation: chrome-shine 6s ease-in-out infinite alternate;
+}
+
+@keyframes chrome-shine {
+  from {
+    background-position: 50% 0%;
+  }
+  to {
+    background-position: 50% 100%;
+  }
+}
+
+/*
+ * Smart-animate names are scoped: an element's --vt name only applies while its own demo is
+ * animating, so other demos aren't lifted into the transition layer (above the navbar).
+ */
+:root[data-vt-scope="sign"] .vt-sign,
+:root[data-vt-scope="col"] .vt-col {
+  view-transition-name: var(--vt);
+}
+
+/* Page chrome gets its own layers so it stays on top of anything animating beneath it. */
+.vt-chrome-header {
+  view-transition-name: site-header;
+}
+.vt-chrome-line {
+  view-transition-name: side-line;
+}
+.vt-chrome-contact {
+  view-transition-name: side-contact;
+}
+
+/* Smart-animate defaults for every View Transition on the site (playground demos). */
+::view-transition-group(*) {
+  animation-duration: 500ms;
+  animation-timing-function: var(--ease-out-soft);
+}
+
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 300ms;
+}
+
+/* Collectibles: a slightly longer, iOS-like glide so covers settle instead of snapping. */
+:root[data-vt-scope="col"]::view-transition-group(*) {
+  animation-duration: 600ms;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+:root[data-vt-scope="col"]::view-transition-old(*),
+:root[data-vt-scope="col"]::view-transition-new(*) {
+  animation-duration: 250ms;
+}
+
+/* Tab labels recolour in step with the sliding pill rather than ahead of it. */
+:root[data-vt-scope="col"] .vt-col-label {
+  view-transition-class: col-label;
+}
+
+:root[data-vt-scope="col"]::view-transition-old(*.col-label),
+:root[data-vt-scope="col"]::view-transition-new(*.col-label) {
+  animation-duration: 450ms;
+  animation-timing-function: ease-in-out;
+}
+
+/*
+ * Smart-animate for the playground signing demo (View Transitions). The pill morphs between
+ * "See more" → "Finish Signing" → "Signing done"; the dashed frame and pen button grow in and out.
+ * Steps run in sequence (data-vt-step is set on <html> by smartAnimate):
+ *   open:  pill slides down → frame grows in around it
+ *   close: frame shrinks away → pill morphs → pen button pops in
+ */
+::view-transition-group(sign-pill),
+::view-transition-group(sign-frame),
+::view-transition-group(sign-pen) {
+  animation-duration: 500ms;
+  animation-timing-function: var(--ease-out-soft);
+  animation-fill-mode: both;
+}
+
+/* Keep the pill's label at its natural size while the box morphs, instead of stretching it. */
+::view-transition-old(sign-pill),
+::view-transition-new(sign-pill) {
+  inset: 0;
+  margin: auto;
+  width: auto;
+  height: 100%;
+  animation-duration: 350ms;
+  animation-fill-mode: both;
+}
+
+::view-transition-new(sign-frame):only-child,
+::view-transition-new(sign-pen):only-child {
+  animation: vt-grow-in 450ms var(--ease-out-soft) both;
+}
+
+::view-transition-old(sign-frame):only-child,
+::view-transition-old(sign-pen):only-child {
+  animation: vt-grow-in 280ms var(--ease-out-soft) reverse both;
+}
+
+/* Open: frame waits for the pill to land. */
+:root[data-vt-step="sign-open"]::view-transition-new(sign-frame):only-child {
+  animation-delay: 400ms;
+}
+
+/* Close: pill waits for the frame to shrink away, then the pen follows the pill. */
+:root[data-vt-step="sign-close"]::view-transition-group(sign-pill),
+:root[data-vt-step="sign-close"]::view-transition-old(sign-pill),
+:root[data-vt-step="sign-close"]::view-transition-new(sign-pill) {
+  animation-delay: 220ms;
+}
+
+:root[data-vt-step="sign-close"]::view-transition-new(sign-pen):only-child {
+  animation-delay: 600ms;
+}
+
+@keyframes vt-grow-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+/* Browsers without View Transitions get a simple pop-in instead. */
+@supports not (view-transition-name: none) {
+  .vt-pop {
+    animation: var(--animate-pop-in);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chrome-text,
+  .letter-3d {
+    animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
