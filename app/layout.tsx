@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
+import { ScreenHeight } from "@/components/screen-height";
 import { SideRail } from "@/components/side-rail";
 import { SiteHeader } from "@/components/site-header";
 import { profile } from "@/lib/content";
@@ -46,7 +47,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${geist.variable} antialiased`}>
+    <html lang="en" className={`${geist.variable} antialiased motion-safe:scroll-smooth`}>
       <body className="overflow-x-clip">
         <a
           href="#main"
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
+        <ScreenHeight />
         <SideRail />
         <div className="relative z-10 mx-auto w-[min(800px,calc(100%-32px))] pb-24 pt-5 sm:pb-32">
           <SiteHeader />

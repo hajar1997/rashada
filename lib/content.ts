@@ -16,6 +16,8 @@ export const profile = {
   role: "UX/UI Designer",
   location: "Baku, Azerbaijan",
   email: "gurbanovarashada@gmail.com",
+  /** One-line summary under the name on the home page. */
+  tagline: "UX/UI Designer turning complex SaaS, web and mobile products into interfaces that feel simple and intuitive.",
   intro:
     "Hey! I'm Rashada - a UX/UI designer based in Baku who's spent the last 3 years untangling complex SaaS, web, and mobile products into something people can actually navigate without a manual. My days are a mix of user research, pixel-perfect UI kits, and a lot of translating “how it works” into “how it should feel.” Before design, I trained in fine art - that eye for detail never left.",
   story: [

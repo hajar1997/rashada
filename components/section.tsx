@@ -14,7 +14,7 @@ export function Section({ id, title, note, children }: SectionProps) {
       aria-labelledby={id}
       className="flex w-full flex-col items-center gap-10 border-b-[0.4px] border-muted pb-9"
     >
-      <h2 id={id} className="text-[28px] font-medium tracking-[-0.01em] sm:text-[32px]">
+      <h2 id={id} className="scroll-mt-32 text-[28px] font-medium tracking-[-0.01em] sm:text-[32px]">
         {title}
       </h2>
       {children}

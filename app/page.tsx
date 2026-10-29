@@ -1,19 +1,16 @@
 import Link from "next/link";
 import { ArrowUpRightIcon } from "@/components/icons";
-import { Intro } from "@/components/intro";
+import { Hero } from "@/components/hero";
 import { Playground } from "@/components/playground";
 import { ProjectCard } from "@/components/project-card";
 import { Section, notes } from "@/components/section";
 import { Services } from "@/components/services";
-import { featuredProjects, profile } from "@/lib/content";
+import { featuredProjects } from "@/lib/content";
 
 export default function HomePage() {
   return (
     <div className="flex flex-col gap-[60px]">
-      <h1 className="sr-only">
-        {profile.name}, {profile.role}
-      </h1>
-      <Intro paragraphs={[profile.intro]} />
+      <Hero />
       <Services />
 
       <Section id="recent-works" title="Recent works" note={notes.projects}>
