@@ -48,21 +48,6 @@ export function ArrowNarrowRightIcon(props: IconProps) {
   );
 }
 
-/** Bold pointer that marks the hovered project on wide screens. */
-export function PointerIcon(props: IconProps) {
-  return (
-    <svg {...base} width={36} height={25} viewBox="0 0 36 25" {...props}>
-      <path
-        d="M3 12.5h30m-9.5 9.5 9.5-9.5L23.5 3"
-        stroke="currentColor"
-        strokeWidth={6}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 export function MailIcon(props: IconProps) {
   return (
     <svg {...base} width={20} height={20} viewBox="0 0 20 20" {...props}>

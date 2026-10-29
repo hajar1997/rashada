@@ -1,6 +1,5 @@
 import Link from "next/link";
 import type { Project } from "@/lib/content";
-import { PointerIcon } from "./icons";
 import { ProjectCover } from "./project-cover";
 
 type ProjectCardProps = {
@@ -38,7 +37,6 @@ export function ProjectCard({ project, headingLevel: Heading = "h3" }: ProjectCa
         </div>
       </Link>
 
-      <PointerIcon className="pointer-events-none absolute -left-[67px] top-[162px] hidden -translate-x-3 text-accent opacity-0 transition duration-300 ease-out-soft group-hover:translate-x-0 group-hover:opacity-100 group-focus-within:translate-x-0 group-focus-within:opacity-100 xl:block" />
     </article>
   );
 }

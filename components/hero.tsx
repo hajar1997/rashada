@@ -14,9 +14,9 @@ export function Hero() {
     // @container lets the name scale with the column (cqw), so it stays on one line on every screen.
     <section
       aria-labelledby="hero-title"
-      className="@container flex min-h-[calc(var(--screen,100svh)-156px)] w-full flex-col items-center pb-8 text-center sm:min-h-[calc(var(--screen,100svh)-192px)]"
+      className="@container relative flex min-h-[calc(var(--screen,100svh)-156px)] w-full flex-col items-center border-b-[0.4px] border-muted pb-8 text-center sm:min-h-[calc(var(--screen,100svh)-192px)]"
     >
-      <div className="flex flex-1 flex-col items-center justify-center gap-5">
+      <div className="relative flex flex-1 flex-col items-center justify-center gap-5">
         <h1
           id="hero-title"
           className="text-[8.5cqw] leading-tight font-extrabold whitespace-nowrap text-white uppercase"
@@ -26,7 +26,9 @@ export function Hero() {
         <p className="text-xl text-pretty text-muted">{profile.tagline}</p>
       </div>
 
-      <ScrollHint />
+      <div className="relative">
+        <ScrollHint />
+      </div>
     </section>
   );
 }
