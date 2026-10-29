@@ -55,7 +55,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         <SideRail />
-        <div className="relative z-10 mx-auto w-[min(640px,calc(100%-32px))] pb-24 pt-5 sm:pb-32">
+        <div className="relative z-10 mx-auto w-[min(800px,calc(100%-32px))] pb-24 pt-5 sm:pb-32">
           <SiteHeader />
           <main id="main" className="mt-16 sm:mt-[100px]">
             {children}

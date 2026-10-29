@@ -6,6 +6,8 @@
 export type ImageAsset = {
   src: string;
   alt: string;
+  /** CSS object-position for cropped frames, e.g. "50% 31%" to match a Figma crop. Defaults to centre. */
+  position?: string;
 };
 
 export const profile = {
@@ -14,7 +16,6 @@ export const profile = {
   role: "UX/UI Designer",
   location: "Baku, Azerbaijan",
   email: "gurbanovarashada@gmail.com",
-  avatar: { src: "/images/avatar.png", alt: "Portrait of Rashada Gurbanova" },
   intro:
     "Hey! I'm Rashada - a UX/UI designer based in Baku who's spent the last 3 years untangling complex SaaS, web, and mobile products into something people can actually navigate without a manual. My days are a mix of user research, pixel-perfect UI kits, and a lot of translating “how it works” into “how it should feel.” Before design, I trained in fine art - that eye for detail never left.",
   story: [
@@ -27,9 +28,7 @@ export const profile = {
 /** Rows mirror the Figma composition on wider screens; on mobile they reflow as one list. */
 export const services: readonly (readonly string[])[] = [
   ["UX Research", "UI Design", "Branding", "Visual design", "Illustration"],
-  ["Information Architecture", "User Personas", "Design Systems", "Wireframing"],
-  ["Prototyping", "User Flow", "Usability & A/B Testing", "CJM", "UI Kit"],
-  ["Figma", "Adobe Illustrator", "Adobe Photoshop", "Adobe XD", "Claude", "Procreate"],
+  ["Figma", "Adobe Illustrator", "Adobe Photoshop", "Adobe XD", "Procreate"],
 ];
 
 export type TimelineEntry = {
@@ -57,16 +56,16 @@ export const experience: readonly TimelineEntry[] = [
   },
 ];
 
-// TODO(content): Figma currently reuses the experience entries here — replace with real education history.
-export const education: readonly TimelineEntry[] = experience;
 
-export const projectCategories = ["Website", "Mobile app", "SaaS"] as const;
+export const projectCategories = ["Website", "Mobile App", "SaaS", "Graphic Design"] as const;
 export type ProjectCategory = (typeof projectCategories)[number];
 
-export type GalleryItem = {
-  span: "full" | "half";
-  image?: ImageAsset;
-};
+export type GalleryItem =
+  | { span: "full" | "half"; image?: ImageAsset }
+  /** A full case-study board (e.g. a 1440px Figma frame), shown wide and uncropped at its own ratio. */
+  | { span: "board"; image: ImageAsset; width: number; height: number }
+  /** A paragraph of case-study copy between boards. */
+  | { span: "text"; text: string };
 
 export type Project = {
   slug: string;
@@ -75,6 +74,12 @@ export type Project = {
   description: string;
   categories: readonly ProjectCategory[];
   cover?: ImageAsset;
+  /** Vector cover built in code (used instead of `cover`), e.g. the Revit icon grid. */
+  coverArt?: "revit-icons";
+  /** Closing credit for a collaborator, shown at the end of the project page. */
+  collaborator?: { name: string; href: string };
+  /** Card meta line ("Mobile App · 2024"); cards without it show the summary instead. */
+  meta?: readonly string[];
   gallery: readonly GalleryItem[];
 };
 
@@ -91,24 +96,113 @@ const placeholderGallery: readonly GalleryItem[] = [
   { span: "half" },
   { span: "full" },
 ];
-const placeholderCategories: readonly (readonly ProjectCategory[])[] = [
-  ["Website", "SaaS"],
-  ["Website", "Mobile app"],
-  ["Website"],
-  ["Website", "SaaS"],
-  ["Website", "Mobile app"],
-  ["Website"],
-];
 
 // TODO(content): replace placeholder projects with real case studies.
-export const projects: readonly Project[] = placeholderCategories.map((categories, index) => ({
-  slug: `project-${index + 1}`,
-  title: `Project name ${index + 1}`,
-  summary: placeholderSummary,
-  description: placeholderDescription,
-  categories,
-  gallery: placeholderGallery,
-}));
+/**
+ * Boards from the Figma "EasyDine" page, top to bottom: [frame name, height] (all 1440 wide).
+ * Images live in public/images/projects/easydine/<slug>.webp — refresh them with
+ * scripts/import-board-images.mjs after exporting the frames from Figma.
+ */
+const easyDineBoards: readonly (readonly [string, number])[] = [
+  ["Mockups", 1024],
+  ["Mockups 2", 1024],
+  ["Project Overview", 1024],
+  ["Design Timeline", 630],
+  ["User Interviews", 1042],
+  ["Surveys", 1652],
+  ["Empathy Maps", 2037],
+  ["Personas", 1881],
+  ["Benchmarking", 1355],
+  ["Problem Statements", 909],
+  ["User Story", 538],
+  ["Information Architecture", 2311],
+  ["User Flow", 2846],
+  ["Wireframes", 2957],
+  ["Design System", 3163],
+  ["UI Mockups", 898],
+  ["UI App 1", 2743],
+  ["UI App 2", 1076],
+  ["UI App 3", 3892],
+  ["UI App 4", 2910],
+  ["UI App 5", 746],
+  ["Responsive Website", 6697],
+  ["Websites", 3230],
+  ["Dashboards", 1103],
+  ["User Testing", 1287],
+  ["Maze Usability", 1275],
+  ["Ending", 401],
+];
+
+const boardSlug = (name: string) => name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+const easyDine: Project = {
+  slug: "easydine",
+  title: "EasyDine",
+  summary: "Your table awaits — easy reservations, unforgettable dining. A UX/UI case study for a restaurant booking app and website.",
+  description:
+    "Reserving a table often means long calls, unclear availability, and little information about the restaurant. EasyDine is a platform where diners quickly find nearby restaurants, book instantly, and get personalised recommendations — while restaurants manage reservations and reach more customers. Three months, 10 interviews, 55+ surveys and 60+ screens, from research through testing.",
+  categories: ["Website", "Mobile App"],
+  cover: {
+    src: "/images/projects/easydine-cover.webp",
+    alt: "EasyDine UX/UI case study cover: logo, tagline and the app's home screen",
+    position: "50% 31%", // Figma's crop on the projects card
+  },
+  meta: ["Mobile App", "2024"],
+  gallery: easyDineBoards.map(([name, height]) => ({
+    span: "board",
+    image: { src: `/images/projects/easydine/${boardSlug(name)}.webp`, alt: `EasyDine — ${name}` },
+    width: 1440,
+    height,
+  })),
+};
+
+/** Boards from the Figma "Plugin Icons (details)" frame, all 800 wide. */
+const bimixBoard = (file: string, alt: string, height: number): GalleryItem => ({
+  span: "board",
+  image: { src: `/images/projects/bimix-plugin-icons/${file}.webp`, alt },
+  width: 800,
+  height,
+});
+
+const bimixIcons: Project = {
+  slug: "bimix-plugin-icons",
+  title: "BIMix Plugin Icons",
+  summary: "A product icon system for a suite of Revit plugins.",
+  description: [
+    "A product icon system for a suite of Revit plugins.",
+    "This project focuses on designing a unified icon family for BIMix's Revit plugins. The aim was to make specialized BIM tools, from architecture and structure to MEP and safety, easy to recognize at a glance, both inside Revit and across the BIMix platform.",
+    "Each icon combines a clean outline with a single blue accent that highlights the core idea of the tool. This keeps the set consistent while giving every plugin its own identity.",
+    "The system is designed for both dark and light modes, so the icons stay clear and balanced in any interface.",
+  ].join("\n\n"),
+  categories: ["Graphic Design"],
+  coverArt: "revit-icons",
+  meta: ["Graphic Design", "2026"],
+  collaborator: { name: "Sarkhan Salahzada", href: "https://www.linkedin.com/in/sarkhansalahzada/" },
+  gallery: [
+    bimixBoard("dark-icon-set", "BIMix plugin icons — full set in dark mode", 511),
+    bimixBoard("light-icon-set", "BIMix plugin icons — full set in light mode", 511),
+    {
+      span: "text",
+      text: "With 54 icons built on a shared 32px grid and a 4px stroke, the set is ready to grow alongside the BIMix product line.",
+    },
+    bimixBoard("grid-system", "Icon grid system: keylines, padding and stroke construction", 513),
+    bimixBoard("marketplace", "The icons in use on the BIMix plugin marketplace", 511),
+  ],
+};
+
+export const projects: readonly Project[] = [
+  bimixIcons,
+  easyDine,
+  // TODO(content): the one remaining placeholder from the Figma projects page.
+  {
+    slug: "project-3",
+    title: "Project name 3",
+    summary: placeholderSummary,
+    description: placeholderDescription,
+    categories: ["Website", "Mobile App", "Graphic Design"],
+    gallery: placeholderGallery,
+  },
+];
 
 export const featuredProjects = projects.slice(0, 3);
 
@@ -116,7 +210,7 @@ export function getProject(slug: string): Project | undefined {
   return projects.find((project) => project.slug === slug);
 }
 
-export const playgroundCategories = ["Illustration", "Animation", "Visuals", "Art", "Geometry"] as const;
+export const playgroundCategories = ["Animation", "Illustration", "Visuals", "Art", "Geometry"] as const;
 export type PlaygroundCategory = (typeof playgroundCategories)[number];
 
 export type PlaygroundItem = {
@@ -157,6 +251,11 @@ export type AboutCard =
 /** The draggable card stack at the end of the about page (Figma "Cards" frame plus quotes). */
 export const aboutCards: readonly AboutCard[] = [
   {
+    id: "portrait",
+    kind: "photo",
+    image: { src: "/images/portrait.png", alt: "Rashada resting her chin in her hands, pulling a face" },
+  },
+  {
     id: "inspiration",
     kind: "tags",
     title: "What inspires me:",
@@ -169,11 +268,6 @@ export const aboutCards: readonly AboutCard[] = [
       { label: "People", x: 84, y: 252, rotate: 9 },
       { label: "Jazz", x: 180, y: 250, rotate: -4 },
     ],
-  },
-  {
-    id: "portrait",
-    kind: "photo",
-    image: { src: "/images/portrait.png", alt: "Rashada resting her chin in her hands, pulling a face" },
   },
   { id: "monogram", kind: "letter", letter: "R" },
   { id: "quote-pop", kind: "quote", text: "Can you make it pop a little more?", author: "Every client, ever" },

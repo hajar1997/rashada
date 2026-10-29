@@ -34,16 +34,20 @@ export function Playground({ initialCategory = playgroundCategories[0] }: { init
           <li key={item.id}>
             {item.demo ? (
               // Demos need their full Figma height, so these tiles don't shrink below 300px.
-              <div className="aspect-[592/300] min-h-[300px] w-full overflow-hidden rounded-2xl sm:rounded-3xl">
-                {item.demo === "signature" && <SignatureDemo />}
-                {item.demo === "collectibles" && <CollectiblesDemo />}
-                {item.demo === "emotions" && <EmotionDemo />}
+              <div className="grid aspect-[752/480] min-h-[300px] w-full place-items-center overflow-hidden rounded-2xl bg-paper sm:rounded-3xl">
+                {/* From md up the demos render 25% larger (zoom) at 80% of the tile, so the scaled box is
+                    tile-sized; the grid centres it either way. Pointer maths in each demo is zoom-aware. */}
+                <div className="size-full md:h-[80%] md:w-[80%] md:[zoom:1.25]">
+                  {item.demo === "signature" && <SignatureDemo />}
+                  {item.demo === "collectibles" && <CollectiblesDemo />}
+                  {item.demo === "emotions" && <EmotionDemo />}
+                </div>
               </div>
             ) : (
               <Media
                 image={item.image}
-                sizes="(min-width: 640px) 592px, calc(100vw - 64px)"
-                className="aspect-[592/300] w-full rounded-2xl sm:rounded-3xl"
+                sizes="(min-width: 832px) 752px, calc(100vw - 64px)"
+                className="aspect-[752/480] w-full rounded-2xl sm:rounded-3xl"
               />
             )}
           </li>

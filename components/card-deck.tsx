@@ -86,7 +86,7 @@ function shuffleAfter(ids: readonly string[], keep: number) {
   return [...ids.slice(0, keep), ...rest];
 }
 
-/** Cards that always lead the stack, in content order: "What inspires me", then the photo. */
+/** Cards that always lead the stack, in content order: the photo, then "What inspires me". */
 const FIXED_LEAD = 2;
 
 const shuffledCache = new WeakMap<readonly string[], readonly string[]>();
@@ -204,19 +204,24 @@ export function CardDeck({ items }: { items: readonly AboutCard[] }) {
             } ${isTop ? "cursor-grab" : ""}`}
           >
             <CardFace card={item} />
-            <span
-              aria-hidden
-              className={`absolute inset-x-0 bottom-[15px] flex items-center justify-center gap-1 text-xs text-white mix-blend-difference transition-opacity duration-300 ${
-                isTop && !dragging ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              <ArrowNarrowLeftIcon />
-              Drag
-              <ArrowNarrowRightIcon />
-            </span>
           </div>
         );
       })}
+
+      {/* "Drag" hint on the first card only (the photo the deck opens on): it teaches the gesture once and
+          stays hidden on every other card. Laid over the resting top card's bottom edge (card 354px tall,
+          centred in the 428px deck, hint 47px above its edge so it sits on the light part of the photo). */}
+      <span
+        aria-hidden
+        style={{ zIndex: order.length + 1 }}
+        className={`pointer-events-none absolute inset-x-0 bottom-[84px] flex items-center justify-center gap-1 text-xs text-ink transition-opacity duration-300 ${
+          start === 0 && !drag ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <ArrowNarrowLeftIcon />
+        Drag
+        <ArrowNarrowRightIcon />
+      </span>
     </div>
   );
 }

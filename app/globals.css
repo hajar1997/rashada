@@ -73,19 +73,6 @@
     animation-timeline: scroll(root block);
   }
 
-  /* The horizon line and contact tab ride down with the ruler's fill edge. */
-  .scroll-follow {
-    animation: scroll-follow linear both;
-    animation-timeline: scroll(root block);
-  }
-
-  @keyframes scroll-follow {
-    to {
-      /* Ruler height: 27 one-pixel ticks with 8px gaps. */
-      transform: translateY(235px);
-    }
-  }
-
   @keyframes scroll-fill {
     from {
       clip-path: inset(0 0 100% 0);
@@ -161,15 +148,9 @@
   view-transition-name: var(--vt);
 }
 
-/* Page chrome gets its own layers so it stays on top of anything animating beneath it. */
+/* The navbar gets its own layer so it stays on top of anything animating beneath it. */
 .vt-chrome-header {
   view-transition-name: site-header;
-}
-.vt-chrome-line {
-  view-transition-name: side-line;
-}
-.vt-chrome-contact {
-  view-transition-name: side-contact;
 }
 
 /* Smart-animate defaults for every View Transition on the site (playground demos). */

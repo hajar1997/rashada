@@ -38,6 +38,7 @@ export function SectionNote({ lines }: { lines: readonly string[] }) {
 
 export const notes = {
   services: ["Need something special?", "I’m always up for something new."],
+  projects: ["A few favourites from the last 3 years.", "There’s more where these came from."],
   highlights: ["That’s just the highlights reel.", "Scroll down to see it all come together."],
   playground: ["No client, no brief - just me having fun.", "This is where ideas go to play."],
 } as const;

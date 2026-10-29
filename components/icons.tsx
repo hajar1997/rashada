@@ -189,6 +189,20 @@ export function DotsIcon(props: IconProps) {
   );
 }
 
+export function ZoomInIcon(props: IconProps) {
+  return (
+    <svg {...base} width={20} height={20} viewBox="0 0 20 20" {...props}>
+      <path
+        d="m17.5 17.5-3.625-3.625M9.167 6.667v5m-2.5-2.5h5m4.166 0a6.667 6.667 0 1 1-13.333 0 6.667 6.667 0 0 1 13.333 0Z"
+        stroke="currentColor"
+        strokeWidth={1.75}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function WinkIcon(props: IconProps) {
   return (
     <svg {...base} width={24} height={24} viewBox="0 0 24 24" {...props}>

@@ -21,6 +21,7 @@ export function Media({ image, sizes, className = "", imageClassName = "", prelo
           sizes={sizes}
           preload={preload}
           draggable={false}
+          style={image.position ? { objectPosition: image.position } : undefined}
           className={`object-cover ${imageClassName}`}
         />
       )}

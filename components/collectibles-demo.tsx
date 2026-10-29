@@ -72,8 +72,10 @@ export function CollectiblesDemo() {
   const back = songs[(top + 1) % songs.length];
 
   return (
-    <div className="flex size-full justify-center bg-paper px-4 pt-[21px] text-ink">
-      <div className="flex w-[296px] flex-col gap-3">
+    // Centred in the tile. The panel is as tall as its tallest view (grid, 259px), so the heading
+    // and tabs stay put when switching views; only the covers move.
+    <div className="flex size-full items-center justify-center bg-paper px-4 py-5 text-ink">
+      <div className="flex min-h-[259px] w-[296px] flex-col gap-3">
         <p className="text-sm font-semibold text-[#5b5b5b]">Collectibles</p>
 
         <div role="tablist" aria-label="Collection layout" className="flex gap-2 border-b border-placeholder pb-2">

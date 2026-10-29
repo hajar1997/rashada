@@ -16,7 +16,7 @@ export default function HomePage() {
       <Intro paragraphs={[profile.intro]} />
       <Services />
 
-      <Section id="recent-works" title="Recent works" note={notes.services}>
+      <Section id="recent-works" title="Recent works" note={notes.projects}>
         <ul className="flex w-full flex-col gap-6">
           {featuredProjects.map((project) => (
             <li key={project.slug}>
