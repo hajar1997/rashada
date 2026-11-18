@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Fragment } from "react";
 import { notFound } from "next/navigation";
 import { BoardGallery } from "@/components/board-gallery";
 import { ArrowUpRightIcon } from "@/components/icons";
@@ -49,6 +50,31 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
                 {paragraph}
               </p>
             ))}
+            {project.role && (
+              <p className="text-pretty">
+                <strong className="font-medium text-paper">My role:</strong>{" "}
+                {project.role.split("{collaborator}").map((part, index) => (
+                  <Fragment key={index}>
+                    {index > 0 && project.collaborator && (
+                      <a
+                        href={project.collaborator.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group inline-flex items-center gap-0.5 text-paper underline decoration-muted underline-offset-4 transition-colors hover:decoration-paper"
+                      >
+                        {project.collaborator.name}
+                        <ArrowUpRightIcon
+                          aria-hidden
+                          className="size-4 transition-transform duration-300 ease-out-soft group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                        />
+                        <span className="sr-only">(LinkedIn, opens in a new tab)</span>
+                      </a>
+                    )}
+                    {part}
+                  </Fragment>
+                ))}
+              </p>
+            )}
           </div>
         </div>
       </header>
@@ -70,26 +96,6 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
             </li>
           ))}
         </ul>
-      )}
-
-      {project.collaborator && (
-        <p className="border-t-[0.4px] border-muted pt-9 text-muted">
-          I worked on this project together with my colleague{" "}
-          <a
-            href={project.collaborator.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group inline-flex items-center gap-1 text-paper underline decoration-muted underline-offset-4 transition-colors hover:decoration-paper"
-          >
-            {project.collaborator.name}
-            <ArrowUpRightIcon
-              aria-hidden
-              className="size-4 transition-transform duration-300 ease-out-soft group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-            />
-            <span className="sr-only">(LinkedIn, opens in a new tab)</span>
-          </a>
-          .
-        </p>
       )}
     </article>
   );

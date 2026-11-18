@@ -59,7 +59,7 @@ export const experience: readonly TimelineEntry[] = [
 ];
 
 
-export const projectCategories = ["Website", "Mobile App", "SaaS", "Graphic Design"] as const;
+export const projectCategories = ["Website", "Mobile App", "SaaS", "Visual Design"] as const;
 export type ProjectCategory = (typeof projectCategories)[number];
 
 export type GalleryItem =
@@ -78,28 +78,15 @@ export type Project = {
   cover?: ImageAsset;
   /** Vector cover built in code (used instead of `cover`), e.g. the Revit icon grid. */
   coverArt?: "revit-icons";
-  /** Closing credit for a collaborator, shown at the end of the project page. */
+  /** Collaborator, linked wherever `{collaborator}` appears in `role`. */
   collaborator?: { name: string; href: string };
+  /** "My role:" paragraph after the description; `{collaborator}` becomes a link to them. */
+  role?: string;
   /** Card meta line ("Mobile App · 2024"); cards without it show the summary instead. */
   meta?: readonly string[];
   gallery: readonly GalleryItem[];
 };
 
-const placeholderSummary =
-  "Lorem ipsum dolor sit amet consectetur. Pharetra pellentesque vitae bibendum elit ultrices molestie. Eu luctus bibendum et aliquet duis.";
-const placeholderDescription =
-  "Lorem ipsum dolor sit amet consectetur. Sem convallis felis nisi nec ornare tincidunt integer interdum. Lectus at interdum eu tincidunt. Lacinia cursus gravida egestas laoreet libero lacus. Cursus iaculis lorem ut odio. Non neque mi elit pharetra pulvinar mattis. Dictum ut curabitur ac odio amet felis eu augue.";
-const placeholderGallery: readonly GalleryItem[] = [
-  { span: "full" },
-  { span: "half" },
-  { span: "half" },
-  { span: "full" },
-  { span: "half" },
-  { span: "half" },
-  { span: "full" },
-];
-
-// TODO(content): replace placeholder projects with real case studies.
 /**
  * Boards from the Figma "EasyDine" page, top to bottom: [frame name, height] (all 1440 wide).
  * Images live in public/images/projects/easydine/<slug>.webp — refresh them with
@@ -173,20 +160,15 @@ const bimixIcons: Project = {
   description: [
     "A product icon system for a suite of Revit plugins.",
     "This project focuses on designing a unified icon family for BIMix's Revit plugins. The aim was to make specialized BIM tools, from architecture and structure to MEP and safety, easy to recognize at a glance, both inside Revit and across the BIMix platform.",
-    "Each icon combines a clean outline with a single blue accent that highlights the core idea of the tool. This keeps the set consistent while giving every plugin its own identity.",
-    "The system is designed for both dark and light modes, so the icons stay clear and balanced in any interface.",
   ].join("\n\n"),
-  categories: ["Graphic Design"],
+  categories: ["Visual Design"],
   coverArt: "revit-icons",
-  meta: ["Graphic Design", "2026"],
+  meta: ["Visual Design", "2026"],
   collaborator: { name: "Sarkhan Salahzada", href: "https://www.linkedin.com/in/sarkhansalahzada/" },
+  role: "I designed this icon system together with my colleague {collaborator}. As a team, we defined the core rules of the set: the 32px grid, 4px stroke, keyline shapes and the single blue accent, so that every new icon would fit the family naturally. We worked closely with the plugin developers and BIM specialists to understand what each tool does and turn it into a simple, recognizable metaphor. The system is designed for both dark and light modes, so the icons stay clear and balanced in any interface.",
   gallery: [
     bimixBoard("dark-icon-set", "BIMix plugin icons — full set in dark mode", 511),
     bimixBoard("light-icon-set", "BIMix plugin icons — full set in light mode", 511),
-    {
-      span: "text",
-      text: "With 54 icons built on a shared 32px grid and a 4px stroke, the set is ready to grow alongside the BIMix product line.",
-    },
     bimixBoard("grid-system", "Icon grid system: keylines, padding and stroke construction", 513),
     bimixBoard("marketplace", "The icons in use on the BIMix plugin marketplace", 511),
   ],
@@ -195,15 +177,6 @@ const bimixIcons: Project = {
 export const projects: readonly Project[] = [
   bimixIcons,
   easyDine,
-  // TODO(content): the one remaining placeholder from the Figma projects page.
-  {
-    slug: "project-3",
-    title: "Project name 3",
-    summary: placeholderSummary,
-    description: placeholderDescription,
-    categories: ["Website", "Mobile App", "Graphic Design"],
-    gallery: placeholderGallery,
-  },
 ];
 
 export const featuredProjects = projects.slice(0, 3);
