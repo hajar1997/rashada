@@ -1,28 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useState, type PointerEvent } from "react";
-
-const MIN = 1;
-const MAX = 3;
-const STEP = 0.5;
-
-type Pan = { x: number; y: number };
+import { useEffect, useRef, useState } from "react";
 
 const control =
-  "grid size-9 place-items-center rounded-full bg-ink/80 text-paper backdrop-blur-sm transition-colors hover:bg-ink disabled:opacity-40 disabled:hover:bg-ink/80";
+  "grid size-9 place-items-center rounded-full bg-ink/80 text-paper backdrop-blur-sm transition-colors hover:bg-ink";
+
+/** Safari on iPhone only lets the <video> itself go full screen, via this non-standard method. */
+type IOSVideo = HTMLVideoElement & { webkitEnterFullscreen?: () => void };
 
 /**
- * A screen recording that plays muted on a loop, with zoom (100–300%) and drag-to-pan so viewers
- * can read the small UI details. Controls sit in the bottom-right corner.
+ * A screen recording that plays muted on a loop, framed at its own proportions, with play/pause
+ * and a full-screen button (or double-click) so viewers can see the UI details large.
  */
 export function ZoomableVideo({ src, label }: { src: string; label: string }) {
   const frameRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const dragRef = useRef<{ x: number; y: number; pan: Pan } | null>(null);
-  const [zoom, setZoom] = useState(MIN);
-  const [pan, setPan] = useState<Pan>({ x: 0, y: 0 });
   const [playing, setPlaying] = useState(true);
-  const [dragging, setDragging] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
   // The frame takes the recording's own proportions once its size is known (752:480 until then).
   const [ratio, setRatio] = useState("752 / 480");
 
@@ -30,29 +24,15 @@ export function ZoomableVideo({ src, label }: { src: string; label: string }) {
     if (video.videoWidth && video.videoHeight) setRatio(`${video.videoWidth} / ${video.videoHeight}`);
   }
 
-  // The size may already be known if the video loaded before hydration (its event fired too early).
   useEffect(() => {
+    // The size may already be known if the video loaded before hydration (its event fired too early).
     const video = videoRef.current;
     if (video && video.readyState >= 1) readRatio(video);
+
+    const onChange = () => setFullscreen(document.fullscreenElement === frameRef.current);
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
   }, []);
-
-  /** Keep the zoomed video covering the frame: pan at most half the extra size each way. */
-  function clamp(next: Pan, scale: number): Pan {
-    const frame = frameRef.current;
-    if (!frame) return next;
-    const maxX = ((scale - 1) * frame.offsetWidth) / 2;
-    const maxY = ((scale - 1) * frame.offsetHeight) / 2;
-    return {
-      x: Math.min(maxX, Math.max(-maxX, next.x)),
-      y: Math.min(maxY, Math.max(-maxY, next.y)),
-    };
-  }
-
-  function zoomTo(next: number) {
-    const scale = Math.min(MAX, Math.max(MIN, next));
-    setZoom(scale);
-    setPan((current) => clamp(current, scale));
-  }
 
   function togglePlay() {
     const video = videoRef.current;
@@ -66,42 +46,26 @@ export function ZoomableVideo({ src, label }: { src: string; label: string }) {
     }
   }
 
-  /** Pointer deltas in the frame's layout px (the rect/offset ratio absorbs CSS zoom). */
-  function layoutScale() {
+  function toggleFullscreen() {
     const frame = frameRef.current;
-    return frame ? frame.offsetWidth / frame.getBoundingClientRect().width : 1;
-  }
-
-  function onPointerDown(event: PointerEvent<HTMLDivElement>) {
-    if (zoom === MIN || event.button !== 0) return;
-    event.currentTarget.setPointerCapture(event.pointerId);
-    dragRef.current = { x: event.clientX, y: event.clientY, pan };
-    setDragging(true);
-  }
-
-  function onPointerMove(event: PointerEvent<HTMLDivElement>) {
-    const drag = dragRef.current;
-    if (!drag) return;
-    const k = layoutScale();
-    setPan(clamp({ x: drag.pan.x + (event.clientX - drag.x) * k, y: drag.pan.y + (event.clientY - drag.y) * k }, zoom));
-  }
-
-  function endDrag() {
-    dragRef.current = null;
-    setDragging(false);
+    const video = videoRef.current as IOSVideo | null;
+    if (!frame || !video) return;
+    if (document.fullscreenElement) {
+      void document.exitFullscreen();
+    } else if (frame.requestFullscreen) {
+      void frame.requestFullscreen();
+    } else {
+      video.webkitEnterFullscreen?.();
+    }
   }
 
   return (
-    <figure className="relative">
+    <figure>
       <div
         ref={frameRef}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={endDrag}
-        onPointerCancel={endDrag}
-        style={{ aspectRatio: ratio }}
-        className={`relative w-full touch-none overflow-hidden rounded-2xl bg-surface sm:rounded-3xl ${
-          zoom > MIN ? (dragging ? "cursor-grabbing" : "cursor-grab") : ""
+        style={fullscreen ? undefined : { aspectRatio: ratio }}
+        className={`relative w-full overflow-hidden ${
+          fullscreen ? "grid place-items-center bg-black" : "rounded-2xl bg-surface sm:rounded-3xl"
         }`}
       >
         <video
@@ -114,65 +78,50 @@ export function ZoomableVideo({ src, label }: { src: string; label: string }) {
           playsInline
           preload="metadata"
           onLoadedMetadata={(event) => readRatio(event.currentTarget)}
-          style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
-          className={`size-full object-contain ${dragging ? "" : "transition-transform duration-300 ease-out-soft"}`}
+          onDoubleClick={toggleFullscreen}
+          className="size-full object-contain"
         />
-      </div>
 
-      <figcaption className="sr-only">{label}</figcaption>
-
-      <div className="absolute bottom-3 right-3 flex items-center gap-1.5">
-        <button type="button" onClick={togglePlay} aria-label={playing ? "Pause video" : "Play video"} className={control}>
-          {playing ? (
-            <svg aria-hidden width={14} height={14} viewBox="0 0 14 14" fill="currentColor">
-              <rect x={3} y={2} width={3} height={10} rx={1} />
-              <rect x={8} y={2} width={3} height={10} rx={1} />
-            </svg>
-          ) : (
-            <svg aria-hidden width={14} height={14} viewBox="0 0 14 14" fill="currentColor">
-              <path d="M4 2.5v9l7.5-4.5L4 2.5Z" />
-            </svg>
-          )}
-        </button>
-        <div className="flex items-center gap-1 rounded-full bg-ink/80 p-0.5 backdrop-blur-sm">
-          <button
-            type="button"
-            onClick={() => zoomTo(zoom - STEP)}
-            disabled={zoom <= MIN}
-            aria-label="Zoom out"
-            className={control}
-          >
-            <svg aria-hidden width={14} height={14} viewBox="0 0 14 14" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round">
-              <path d="M3 7h8" />
-            </svg>
+        <div className="absolute bottom-3 right-3 flex items-center gap-1.5">
+          <button type="button" onClick={togglePlay} aria-label={playing ? "Pause video" : "Play video"} className={control}>
+            {playing ? (
+              <svg aria-hidden width={14} height={14} viewBox="0 0 14 14" fill="currentColor">
+                <rect x={3} y={2} width={3} height={10} rx={1} />
+                <rect x={8} y={2} width={3} height={10} rx={1} />
+              </svg>
+            ) : (
+              <svg aria-hidden width={14} height={14} viewBox="0 0 14 14" fill="currentColor">
+                <path d="M4 2.5v9l7.5-4.5L4 2.5Z" />
+              </svg>
+            )}
           </button>
           <button
             type="button"
-            onClick={() => zoomTo(MIN)}
-            aria-label="Reset zoom"
-            className="min-w-12 text-center text-xs text-paper tabular-nums"
-          >
-            {Math.round(zoom * 100)}%
-          </button>
-          <button
-            type="button"
-            onClick={() => zoomTo(zoom + STEP)}
-            disabled={zoom >= MAX}
-            aria-label="Zoom in"
+            onClick={toggleFullscreen}
+            aria-label={fullscreen ? "Exit full screen" : "Full screen"}
             className={control}
           >
-            <svg aria-hidden width={14} height={14} viewBox="0 0 14 14" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round">
-              <path d="M3 7h8M7 3v8" />
+            <svg
+              aria-hidden
+              width={16}
+              height={16}
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.75}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              {fullscreen ? (
+                <path d="M6 2v4H2M10 2v4h4M6 14v-4H2M10 14v-4h4" />
+              ) : (
+                <path d="M2 6V2h4M14 6V2h-4M2 10v4h4M14 10v4h-4" />
+              )}
             </svg>
           </button>
         </div>
       </div>
-
-      {zoom > MIN && (
-        <p aria-hidden className="pointer-events-none absolute left-3 top-3 rounded-full bg-ink/80 px-3 py-1.5 text-xs text-paper">
-          Drag to move
-        </p>
-      )}
+      <figcaption className="sr-only">{label}</figcaption>
     </figure>
   );
 }
