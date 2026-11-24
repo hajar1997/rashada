@@ -210,12 +210,13 @@ const bimixPlugins: Project = {
       span: "section",
       title: "Split Layers · Architecture",
       lines: [
-        "Splits a compound wall or floor into separate elements, one for each layer. Users can host doors and windows on the layer they need and give each new layer its own type name.",
-        "Research: I talked with architects. Before the plugin, they split layers by hand, one element at a time, which was slow and repetitive.",
-        "The solution: I designed two ways to select elements: choosing by type from a list or picking directly in the model. Wall and floor type names are often similar and easy to confuse, so picking in the model lets users select what they actually see. Then they set the type names and choose which layer hosts doors and windows, all in one window.",
+        "A Revit tool that splits a compound wall or floor into separate elements, one per layer.",
+        "Research: I talked with architects who model walls layer by layer for detailed drawings and quantities. Before the plugin they did this by hand, rebuilding each layer as a new element one at a time, which was slow and easy to get wrong.",
+        "The challenge: wall type names in Revit are long and look alike, so picking the right type from a list was confusing. After splitting, doors and windows also need a host layer, or the openings break.",
+        "The solution: I designed one window for the whole process. Users pick the wall from a type list or directly in the model, and its layers and thickness appear right away. They group layers, name each new wall type, and choose which layer hosts doors and windows. One click splits every matching wall, and a progress bar tracks the run.",
       ],
     },
-    { span: "video", label: "Split Layers plugin walkthrough" },
+    { span: "video", label: "Split Layers plugin walkthrough", src: "/videos/bimix-plugins/split-layers.mp4" },
     {
       span: "section",
       title: "Underfloor Heating · Mechanical",
@@ -235,10 +236,15 @@ const bimixPlugins: Project = {
       span: "section",
       title: "CCTV · Electrical",
       lines: [
-        "Places cameras with their DORI zones (Detection, Observation, Recognition, Identification), which show how clearly each camera sees at different distances. Engineers can open a 3D view from any camera and adjust its viewing direction to check coverage before installation.",
+        "A Revit tool for planning security cameras: it shows each camera's coverage on the plan and creates a 3D view from the camera's point of view.",
+        "Research: I talked with engineers who design CCTV systems. They checked coverage by drawing zones by hand and guessing what each camera could actually see. Walls, columns and furniture often blocked the view, and nobody noticed until the cameras were installed.",
+        "The challenge: coverage depends on distance (to detect, observe, recognize or identify a person), on obstacles, and on the camera's angle. Showing all of that clearly in one tool, without making it complicated, was the hard part.",
+        "The solution: I designed one window with two tabs.",
+        "Coverage Zones: users pick cameras on the plan and choose which categories and linked models count as obstacles. The plugin then draws the four DORI distance zones (detect, observe, recognize, identify), with blocked areas cut out.",
+        "Camera Adjustment: users fine-tune pan, tilt and height with a live preview, then generate a 3D view from the camera with its field of view shown.",
       ],
     },
-    { span: "video", label: "CCTV plugin walkthrough" },
+    { span: "video", label: "CCTV plugin walkthrough", src: "/videos/bimix-plugins/cctv.mp4" },
   ],
 };
 
