@@ -67,7 +67,11 @@ export type GalleryItem =
   /** A full case-study board (e.g. a 1440px Figma frame), shown wide and uncropped at its own ratio. */
   | { span: "board"; image: ImageAsset; width: number; height: number }
   /** A paragraph of case-study copy between boards. */
-  | { span: "text"; text: string };
+  | { span: "text"; text: string }
+  /** A titled block of case-study copy; each entry in `lines` is its own line/paragraph. */
+  | { span: "section"; title: string; lines: readonly string[] }
+  /** A video slot; shows a "coming soon" placeholder until `src` is set. */
+  | { span: "video"; label: string; src?: string };
 
 export type Project = {
   slug: string;
@@ -76,6 +80,8 @@ export type Project = {
   description: string;
   categories: readonly ProjectCategory[];
   cover?: ImageAsset;
+  /** Cover for the project page when it differs from the card's (shown at 752:480). */
+  pageCover?: ImageAsset;
   /** Vector cover built in code (used instead of `cover`), e.g. the Revit icon grid. */
   coverArt?: "revit-icons";
   /** Collaborator, linked wherever `{collaborator}` appears in `role`. */
@@ -174,7 +180,70 @@ const bimixIcons: Project = {
   ],
 };
 
+const bimixPlugins: Project = {
+  slug: "bimix-plugins",
+  title: "BIMix Plugins",
+  summary: "UX/UI design for a suite of 25+ Revit plugins.",
+  description: [
+    "UX/UI design for a suite of 25+ Revit plugins",
+    "BIMix builds Revit plugins for architects, BIM specialists and MEP engineers. Before I joined there was no designer: developers made the interfaces, so the plugins looked and worked differently and had many UX problems.",
+    "As a UX/UI designer, I worked with developers and BIM specialists. I researched and designed new plugins from scratch and, in parallel, helped build the BIMix design system. The goal was a clean, consistent SaaS-like experience inside Revit.",
+    "Below are four plugins, one from each discipline.",
+  ].join("\n\n"),
+  categories: ["SaaS"],
+  cover: { src: "/images/projects/bimix-plugins/card-cover.webp", alt: "BIMix Plugins — Revit LT logo and the BIMix mark" },
+  pageCover: { src: "/images/projects/bimix-plugins/page-cover.webp", alt: "BIMix Plugins — Revit LT logo and the BIMix mark" },
+  meta: ["SaaS Design", "2026"],
+  gallery: [
+    {
+      span: "section",
+      title: "Exporter · BIM General",
+      lines: [
+        "A batch export tool for Revit sheets, views and models, to PDF, DWG or image in one run.",
+        "Research: I talked with architects and BIM specialists who prepare drawing sets. Exporting sheets one by one in Revit was slow, and everyone named files differently, so packages had to be checked and renamed by hand.",
+        "The challenge: a project has hundreds of sheets, but each delivery needs only a few, in a set format and naming standard. One mistake meant redoing the whole export.",
+        "The solution: I designed one window for the whole process. Users filter and select sheets in a familiar table, choose the format, and build the file-naming rule with a live preview. They can save the setup and reuse it next time, and a progress window confirms when the export is done.",
+      ],
+    },
+    { span: "video", label: "Exporter plugin walkthrough", src: "/videos/bimix-plugins/exporter.mp4" },
+    {
+      span: "section",
+      title: "Split Layers · Architecture",
+      lines: [
+        "Splits a compound wall or floor into separate elements, one for each layer. Users can host doors and windows on the layer they need and give each new layer its own type name.",
+        "Research: I talked with architects. Before the plugin, they split layers by hand, one element at a time, which was slow and repetitive.",
+        "The solution: I designed two ways to select elements: choosing by type from a list or picking directly in the model. Wall and floor type names are often similar and easy to confuse, so picking in the model lets users select what they actually see. Then they set the type names and choose which layer hosts doors and windows, all in one window.",
+      ],
+    },
+    { span: "video", label: "Split Layers plugin walkthrough" },
+    {
+      span: "section",
+      title: "Underfloor Heating · Mechanical",
+      lines: [
+        "Automatically generates underfloor heating loops for selected rooms and calculates pipe lengths and spacing.",
+        "Research: I talked with mechanical engineers. Before the plugin, they drew every pipe by hand, which took hours and was easy to get wrong.",
+        "The challenge: the plugin had to follow many technical rules (loop standards, manifold placement, maximum pipe lengths) while giving engineers control over zones and the final result.",
+        "Iteration: my first version was a step-by-step wizard. Testing showed engineers wanted to see and adjust everything on one screen, so I redesigned it into a single-screen layout.",
+        "The solution:",
+        "- Auto zones: the plugin creates zones automatically, and engineers can adjust them manually.",
+        "- Preview before applying: results used to appear directly in the project, so a wrong result was hard to undo. Now engineers check everything in a preview first and apply it only when they're happy.",
+        "- Undo/Redo: every step can be reversed, so engineers can experiment safely.",
+      ],
+    },
+    { span: "video", label: "Underfloor Heating plugin walkthrough" },
+    {
+      span: "section",
+      title: "CCTV · Electrical",
+      lines: [
+        "Places cameras with their DORI zones (Detection, Observation, Recognition, Identification), which show how clearly each camera sees at different distances. Engineers can open a 3D view from any camera and adjust its viewing direction to check coverage before installation.",
+      ],
+    },
+    { span: "video", label: "CCTV plugin walkthrough" },
+  ],
+};
+
 export const projects: readonly Project[] = [
+  bimixPlugins,
   bimixIcons,
   easyDine,
 ];

@@ -2,12 +2,13 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import type { ImageAsset } from "@/lib/content";
+import type { GalleryItem } from "@/lib/content";
 import { ArrowNarrowLeftIcon, ArrowNarrowRightIcon, CloseIcon, ZoomInIcon } from "./icons";
+import { ZoomableVideo } from "./zoomable-video";
 
-export type Board = { image: ImageAsset; width: number; height: number };
-/** A paragraph shown between boards (not part of the enlarge viewer). */
-export type BoardNote = { text: string };
+/** What a case study's sequence can hold: boards (enlargeable), copy, titled sections and videos. */
+export type SequenceItem = Exclude<GalleryItem, { span: "full" | "half" }>;
+type Board = Extract<GalleryItem, { span: "board" }>;
 
 const control =
   "grid size-11 place-items-center rounded-full bg-paper/10 text-paper transition-colors hover:bg-paper/20 disabled:opacity-30 disabled:hover:bg-paper/10";
@@ -17,8 +18,8 @@ const control =
  * centred modal with the original export (tall boards scroll inside), with previous/next —
  * at column width the boards' small text isn't legible.
  */
-export function BoardGallery({ items }: { items: readonly (Board | BoardNote)[] }) {
-  const boards = items.filter((item): item is Board => "image" in item);
+export function BoardGallery({ items }: { items: readonly SequenceItem[] }) {
+  const boards = items.filter((item): item is Board => item.span === "board");
   const [open, setOpen] = useState<number | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -56,11 +57,48 @@ export function BoardGallery({ items }: { items: readonly (Board | BoardNote)[] 
   return (
     <>
       <ul className="flex flex-col gap-5">
-        {items.map((item) => {
-          if (!("image" in item)) {
+        {items.map((item, position) => {
+          if (item.span === "text") {
             return (
-              <li key={item.text.slice(0, 32)} className="py-5">
+              <li key={position} className="py-5">
                 <p className="text-pretty text-muted">{item.text}</p>
+              </li>
+            );
+          }
+          if (item.span === "section") {
+            return (
+              <li key={position} className="flex flex-col gap-2 pt-5">
+                <h2 className="text-xl font-medium text-paper">{item.title}</h2>
+                <div className="flex flex-col text-muted">
+                  {item.lines.map((line) => (
+                    <p key={line.slice(0, 32)} className="text-pretty">
+                      {line}
+                    </p>
+                  ))}
+                </div>
+              </li>
+            );
+          }
+          if (item.span === "video") {
+            return (
+              <li key={position} className="pt-5">
+                {item.src ? (
+                  <ZoomableVideo src={item.src} label={item.label} />
+                ) : (
+                  // Placeholder until the recording is ready.
+                  <div
+                    role="img"
+                    aria-label={`${item.label} — video coming soon`}
+                    className="flex aspect-[752/480] w-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-muted/50 bg-surface text-muted sm:rounded-3xl"
+                  >
+                    <span className="grid size-14 place-items-center rounded-full border border-muted/60">
+                      <svg aria-hidden width={18} height={18} viewBox="0 0 18 18" fill="currentColor">
+                        <path d="M5 3.5v11l9-5.5-9-5.5Z" />
+                      </svg>
+                    </span>
+                    <span className="text-sm">Video coming soon</span>
+                  </div>
+                )}
               </li>
             );
           }

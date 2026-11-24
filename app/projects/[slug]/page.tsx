@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Fragment } from "react";
 import { notFound } from "next/navigation";
-import { BoardGallery } from "@/components/board-gallery";
+import { BoardGallery, type SequenceItem } from "@/components/board-gallery";
 import { ArrowUpRightIcon } from "@/components/icons";
 import { Media } from "@/components/media";
 import { ProjectCover } from "@/components/project-cover";
@@ -29,17 +29,17 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
   if (!project) notFound();
 
   // Boards and the copy between them read as one sequence; image tiles use the grid below.
-  const sequence = project.gallery.flatMap((item) => (item.span === "board" || item.span === "text" ? [item] : []));
+  const sequence = project.gallery.filter((item): item is SequenceItem => item.span !== "full" && item.span !== "half");
   const tiles = project.gallery.flatMap((item) => (item.span === "full" || item.span === "half" ? [item] : []));
 
   return (
     <article className="flex flex-col gap-10">
       <header className="flex flex-col gap-5">
         <ProjectCover
-          project={project}
+          project={project.pageCover ? { ...project, cover: project.pageCover } : project}
           sizes="(min-width: 832px) 800px, calc(100vw - 32px)"
           preload
-          className={`${project.coverArt ? "aspect-[752/480]" : "aspect-[800/480]"} w-full rounded-2xl sm:rounded-3xl`}
+          className={`${project.coverArt || project.pageCover ? "aspect-[752/480]" : "aspect-[800/480]"} w-full rounded-2xl sm:rounded-3xl`}
         />
         <div className="flex flex-col gap-2">
           <h1 className="text-2xl font-medium">{project.title}</h1>
